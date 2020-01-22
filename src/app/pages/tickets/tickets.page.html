@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Tickets</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list lines="full">
+
+    <ion-item-sliding *ngFor="let ticket of Tickets">
+      <ion-item-options side="end">
+        <ion-item-option color="danger" (click)="favorite(item)">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+
+      <ion-item [routerLink]="['/chat', ticket.id, ticket.uid, ticket.subject]">
+        <div>{{ticket.subject}}
+        <small class="_m">{{ticket.lastMessage.name}} - {{ticket.lastMessage.message}}</small>
+        </div>
+        <small slot="end" class="_l" [ngClass]="{'closed': ticket.status === 'closed'}">{{ticket.status}}</small>
+      </ion-item>
+    </ion-item-sliding>
+  </ion-list>
+</ion-content>

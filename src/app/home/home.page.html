@@ -1,0 +1,19 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Vinota Support Chat
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list lines="full">
+    <ion-item *ngFor="let user of Users" [routerLink]="['/tickets', user.id]">
+      {{user.id}}
+      <div slot="end">
+        <small>Active {{user.activeCount}}</small>
+        <small class="closed">Closed {{user.closedCount}}</small>
+      </div>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -1,0 +1,126 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+      <ion-avatar slot="start" style="margin-left: 10px; height: 35px; width: 35px;"><img src="/assets/profile.png" /></ion-avatar>
+    </ion-buttons>
+    <ion-title>{{Subject}}</ion-title>
+    <ion-buttons slot="end">
+      <button mat-icon-button (click)="openTopMenu($event)">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list lines="none">
+    <div class="_i" *ngFor="let x of Messages">
+      <!--      USER -->
+      <div *ngIf="x.type === 'user'">
+        <ion-item
+                class="ion-align-items-start"
+                *ngIf="x.imageURL">
+<!--          <ion-avatar><img src="/assets/profile.png" /></ion-avatar>-->
+          <ion-img [src]="x.filepath"
+                   (ionImgDidLoad)="imageLoaded()"
+                   class="_c-i"
+                   alt=""></ion-img>
+        </ion-item>
+        <ion-item class="ion-align-items-start" *ngIf="!x.imageURL">
+<!--          <ion-avatar><img src="/assets/profile.png" /></ion-avatar>-->
+          <div class="bubble">
+
+            <span>{{x.message}}</span>
+              <div class="_a">
+                <small>{{filterTimeFromNow(x.timeStamp)}}</small>
+                <ion-icon name="done-all"></ion-icon>
+              </div>
+          </div>
+        </ion-item>
+      </div><div *ngIf="x.type === 'admin'">
+      <ion-item class="_u ion-align-items-start" *ngIf="x.imageURL">
+        <ion-img [src]="x.filepath"
+                 slot="end"
+                 class="_c-i"
+                 (ionImgDidLoad)="imageLoaded()"
+                 alt=""></ion-img>
+<!--        <ion-avatar slot="end"><img src="/assets/profile.png" /></ion-avatar>-->
+      </ion-item>
+      <ion-item class="_u ion-align-items-start" *ngIf="!x.imageURL">
+        <div class="bubble" slot="end" >
+            <small style="color: blue; font-style: oblique">{{x.name}}</small><br/>
+        <span>{{x.message}}</span>
+          <div class="_a">
+            <small>{{filterTimeFromNow(x.timeStamp)}}</small>
+            <ion-icon name="done-all"></ion-icon>
+          </div>
+        </div>
+<!--        <ion-avatar slot="end"><img src="/assets/profile.png" /></ion-avatar>-->
+      </ion-item>
+    </div>
+    </div>
+  </ion-list>
+
+</ion-content>
+
+
+
+<ion-footer>
+<!--  Pre defined Messages-->
+  <div>
+    <ion-slides [options]="slideOptions">
+      <ion-slide *ngFor="let t of PreDefined">
+        <span (click)="setPreDefinedMsg(t.text)">{{t.text}}</span>
+      </ion-slide>
+    </ion-slides>
+  </div>
+<!--  -->
+  <div class="progress-bar-wrapper" *ngIf="percentage | async as pct">
+    <div>
+      Progress: {{ pct | number }}%
+      <ion-progress-bar color="warning" value="{{ pct / 100 }}"></ion-progress-bar>
+    </div>
+    <div *ngIf="snapshot | async as snap">
+      File Size: {{ snap.totalBytes | fileSizePipe }} Transfered:
+      {{ snap.bytesTransferred | fileSizePipe }}
+      <div *ngIf="snapshot && snap.bytesTransferred != snap.totalBytes">
+<!--        <ion-button-->
+<!--                color="warning"-->
+<!--                size="small"-->
+<!--                (click)="task.pause()"-->
+<!--                class="button is-warning">Pause</ion-button>-->
+<!--        <ion-button-->
+<!--                size="small"-->
+<!--                (click)="task.resume()"-->
+<!--                class="button is-info">Resume</ion-button>-->
+<!--        <ion-button-->
+<!--                color="danger"-->
+<!--                size="small"-->
+<!--                (click)="task.cancel()"-->
+<!--                class="button is-danger">Cancel</ion-button>-->
+      </div>
+    </div>
+  </div>
+  <form [formGroup]="chatForm" (ngSubmit)="sendMessage()">
+    <ion-item lines="none">
+      <input
+              id="uploadBtn"
+              type="file"
+              #file
+              class="upload"
+              (change)="uploadFile($event.target.files)" />
+      <button mat-icon-button
+              (click)="file.click()"
+              type="button">
+        <mat-icon>attachment</mat-icon>
+      </button>
+      <ion-textarea formControlName="chatInput"></ion-textarea>
+      <button mat-icon-button
+              *ngIf="animate"
+              [disabled]="sending">
+        <mat-icon>send</mat-icon>
+      </button>
+    </ion-item>
+  </form>
+</ion-footer>

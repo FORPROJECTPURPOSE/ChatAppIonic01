@@ -1,0 +1,7 @@
+{
+  "name": "vinotaSupport",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
+}
