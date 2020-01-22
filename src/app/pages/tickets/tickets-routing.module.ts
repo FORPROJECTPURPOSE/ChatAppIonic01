@@ -8,10 +8,6 @@ const routes: Routes = [
   {
     path: '',
     component: TicketsPage
-  },
-  {
-    path: '/home',
-    component: HomePage
   }
 ];
 
