@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import {AuthService} from '../auth/auth.service';
 import {ActivatedRoute, RouterModule} from '@angular/router';
-import { ToastController } from '@ionic/angular';
+import {LoadingController, ToastController} from '@ionic/angular';
 import { Router } from '@angular/router';
+import {AngularFireAuth} from '@angular/fire/auth';
+import * as firebase from 'firebase';
+import {WindowService} from './window.service';
 
 @Component({
   selector: 'app-login',
@@ -11,33 +14,73 @@ import { Router } from '@angular/router';
 })
 export class LoginPage implements OnInit {
 
-  email: any;
+  phone: any;
   password: any;
   public resMessage: any;
+  public name: any;
+  private loading: any;
+  private authState: any;
+  private isPhoneNumberAvailable: boolean;
+  windowRef: any;
+  verificationCode: string;
+  private user: any;
+  private showLogin = false;
 
   constructor(private route: ActivatedRoute,
               private auth: AuthService,
               public toastController: ToastController,
-              private router: Router) { }
+              private router: Router,
+              public loadingCtrl: LoadingController,
+              private firebaseAuth: AngularFireAuth,
+              private win: WindowService) {
+
+  }
 
   ngOnInit() {
+    this.isPhoneNumberAvailable = false;
+    this.windowRef = this.win.windowRef;
+    this.windowRef.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+
+    this.windowRef.recaptchaVerifier.render();
   }
 
   login() {
-    if (this.email == null || this.password == null) {
+
+    if (this.phone == null) {
       this.presentToast('Fill in the details!');
       return;
+    } else {
+
+      const appVerifier = this.windowRef.recaptchaVerifier;
+
+      const num = this.phone;
+
+      firebase.auth().signInWithPhoneNumber(num, appVerifier)
+          .then(result => {
+
+            this.windowRef.confirmationResult = result;
+            console.log(result);
+            this.showLogin = true;
+
+          })
+          .catch( error => {
+            console.log(error);
+          } );
     }
-    this.auth.login(this.email, this.password)
-        .then(res => {
-          console.log('aaaaaaaaaaa' + res);
-          this.router.navigate(['/home']);
-          this.presentToast(res);
-        }).catch(errorr => {
-          console.log('gggggggggggggg' + errorr);
-          this.resMessage = errorr;
-          this.presentToast(errorr);
-    });
+  }
+
+  verifyLoginCode() {
+    if (this.verificationCode === null) {
+      this.presentToast('Please inserte Verification Code');
+    }
+    this.windowRef.confirmationResult
+        .confirm(this.verificationCode)
+        .then( result => {
+
+          this.user = result.user;
+
+        })
+        .catch( error => console.log(error, 'Incorrect code entered?'));
   }
 
   async presentToast(MESSAGE) {
@@ -48,5 +91,26 @@ export class LoginPage implements OnInit {
     toast.present();
   }
 
+  // async presentLoadingCustom() {
+  //   const loading = await this.loading.create({
+  //     message: 'Please wait!',
+  //     spinner: 'circles'
+  //   });
+  //   await loading.present();
+  // }
+
+
+  public userData(): any {
+    console.log(this.authState.uid);
+    /*[
+      {
+        id: this.authState.uid,
+        displayName: this.authState.displayName,
+        email: this.authState.email,
+        phoneNumber: this.authState.phoneNumber,
+        photoURL: this.authState.photoURL,
+      }
+    ];*/
+  }
 
 }

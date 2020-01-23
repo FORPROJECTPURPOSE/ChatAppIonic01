@@ -7,9 +7,9 @@ import { IonicModule } from '@ionic/angular';
 import { ChatPageRoutingModule } from './chat-routing.module';
 
 import {ChatPage, FileSizeFormatPipe} from './chat.page';
-import {MatIconModule} from "@angular/material/icon";
-import {MatButtonModule} from "@angular/material/button";
-import {TopMenuComponent} from "./components/top-menu/top-menu.component";
+import {MatIconModule} from '@angular/material/icon';
+import {MatButtonModule} from '@angular/material/button';
+import {TopMenuComponent} from './components/top-menu/top-menu.component';
 
 @NgModule({
     imports: [

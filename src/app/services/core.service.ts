@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import {AngularFirestore} from "@angular/fire/firestore";
-import {map} from "rxjs/operators";
-import {HttpClient} from "@angular/common/http";
-import {ToastController} from "@ionic/angular";
+import {AngularFirestore} from '@angular/fire/firestore';
+import {map} from 'rxjs/operators';
+import {HttpClient} from '@angular/common/http';
+import {ToastController} from '@ionic/angular';
+import actions from "@angular/fire/schematics/deploy/actions";
 
 const API_URL = 'http://173.82.72.107/support/support.cfc?method=';
 
@@ -15,15 +16,28 @@ export class CoreService {
               private toastCtrl: ToastController,
               private http: HttpClient) { }
 
-  public getPreDefinesMessages() {
+
+ public checkPhoneNumber(PHONENUMBER) {
+      return this.db.collection('Admins')
+          .snapshotChanges()
+          .pipe(map(action => action.map(a => {
+              const DATA: any = a.payload.doc.data();
+              DATA.id = a.payload.doc.id;
+              console.log(DATA);
+          })));
+
+ }
+
+ public getPreDefinesMessages() {
     return this.db.collection('pre-defined-messages')
         .snapshotChanges()
         .pipe(map(actions => actions.map(a => {
           const DATA: any = a.payload.doc.data();
           DATA.id = a.payload.doc.id;
           return DATA;
-        })))
+        })));
   }
+
   public getActiveTickets() {
     return this.db.collection('support-chat', ref => ref.where('status', '==', 'active'))
         .snapshotChanges()
@@ -31,7 +45,7 @@ export class CoreService {
           const DATA: any = a.payload.doc.data();
           DATA.id = a.payload.doc.id;
           return DATA;
-        })))
+        })));
   }
   public getLastMessage(USER_ID, TICKET_ID) {
       return this.db.collection(`support-chat/${USER_ID}/tickets/${TICKET_ID}/messages`,
@@ -42,7 +56,7 @@ export class CoreService {
               const DATA: any = a.payload.doc.data();
               DATA.id = a.payload.doc.id;
               return DATA;
-          })))
+          })));
   }
   public getUserActiveTicketsCount(USER_ID, STATUS) {
       return this.db.collection(`support-chat/${USER_ID}/tickets`,
@@ -56,7 +70,7 @@ export class CoreService {
           DATA.id = a.payload.doc.id;
           DATA.uid = USER_ID;
           return DATA;
-        })))
+        })));
   }
   public getTicketMessages(USER_ID, TICKET_ID) {
     return this.db.collection(`support-chat/${USER_ID}/tickets/${TICKET_ID}/messages`, ref => ref.orderBy('timeStamp', 'asc'))
@@ -65,11 +79,11 @@ export class CoreService {
           const DATA: any = a.payload.doc.data();
           DATA.id = a.payload.doc.id;
           return DATA;
-        })))
+        })));
   }
   public addMessage(USER_ID, TICKET_ID, DATA) {
       this.db.collection(`support-chat/${USER_ID}/tickets/${TICKET_ID}/messages`)
-          .add(DATA).then()
+          .add(DATA).then();
   }
   public closeChatUpdate(USER_ID, TICKET_ID) {
       return this.db.doc(`support-chat/${USER_ID}/tickets/${TICKET_ID}`)
@@ -77,15 +91,15 @@ export class CoreService {
   }
   // API SERVICES
   public sendMessagePush(USERNAME, SUBJECT, MESSAGE, TICKET_ID) {
-      return this.http.get(`${API_URL}admin&returnformat=json&username=${USERNAME}&uuid=${'e383630bbf5d8eae'}&sub=${SUBJECT}&text=${MESSAGE}&to=94777552555&status=0&tid=${TICKET_ID}`)
+      return this.http.get(`${API_URL}admin&returnformat=json&username=${USERNAME}&uuid=${'e383630bbf5d8eae'}&sub=${SUBJECT}&text=${MESSAGE}&to=94777552555&status=0&tid=${TICKET_ID}`);
   }
   // CLOSE TICKET
   public closeTicketUpdate(USERNAME, SUBJECT, MESSAGE, TICKET_ID) {
-      return this.http.get(`${API_URL}admin&returnformat=json&username=${USERNAME}&uuid=e383630bbf5d8eae&sub=${SUBJECT}&text=${MESSAGE}&to=94777552555&status=1 `)
+      return this.http.get(`${API_URL}admin&returnformat=json&username=${USERNAME}&uuid=e383630bbf5d8eae&sub=${SUBJECT}&text=${MESSAGE}&to=94777552555&status=1 `);
   }
   // SEND TOKEN
   public sendAdminToken(USERNAME, TOKEN, UUID) {
-      return this.http.get(`https://rest2.vnserv.com/support/admin.cfc?method=admintoken&returnformat=json&username=${USERNAME}&uuid=${UUID}&token=${TOKEN}`)
+      return this.http.get(`https://rest2.vnserv.com/support/admin.cfc?method=admintoken&returnformat=json&username=${USERNAME}&uuid=${UUID}&token=${TOKEN}`);
   }
   // TOAST
   async presentToast(MSG) {

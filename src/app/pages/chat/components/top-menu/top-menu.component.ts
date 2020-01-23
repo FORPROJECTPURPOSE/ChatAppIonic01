@@ -21,7 +21,7 @@ export class TopMenuComponent implements OnInit {
     this.core.closeChatUpdate(DATA.userId, DATA.ticketId)
         .then(() => {
           this.core.presentToast('Ticket Closed Successfully').then();
-        })
+        });
     }
 
 }
