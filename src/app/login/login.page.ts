@@ -78,6 +78,7 @@ export class LoginPage implements OnInit {
         .then( result => {
 
           this.user = result.user;
+          this.router.navigate(['/home']);
 
         })
         .catch( error => console.log(error, 'Incorrect code entered?'));
