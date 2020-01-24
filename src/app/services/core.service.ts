@@ -16,14 +16,16 @@ export class CoreService {
               private toastCtrl: ToastController,
               private http: HttpClient) { }
 
-
  public checkPhoneNumber(PHONENUMBER) {
-      return this.db.collection('Admins')
+     console.log('FFFFFFFFFFFFFFFFFF' + PHONENUMBER);
+
+     return this.db.collection('Admins', ref => ref.where('Phone', '==', PHONENUMBER))
           .snapshotChanges()
           .pipe(map(action => action.map(a => {
               const DATA: any = a.payload.doc.data();
               DATA.id = a.payload.doc.id;
-              console.log(DATA);
+              console.log('FFFFFFFFFFFFFFFFFF' + DATA);
+              return DATA;
           })));
 
  }
@@ -99,6 +101,7 @@ export class CoreService {
   }
   // SEND TOKEN
   public sendAdminToken(USERNAME, TOKEN, UUID) {
+      console.log(`aaaaaaaaaaaaaaaaaaa https://rest2.vnserv.com/support/admin.cfc?method=admintoken&returnformat=json&username=${USERNAME}&uuid=${UUID}&token=${TOKEN}`);
       return this.http.get(`https://rest2.vnserv.com/support/admin.cfc?method=admintoken&returnformat=json&username=${USERNAME}&uuid=${UUID}&token=${TOKEN}`);
   }
   // TOAST

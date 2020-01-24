@@ -6,6 +6,8 @@ import { Router } from '@angular/router';
 import {AngularFireAuth} from '@angular/fire/auth';
 import * as firebase from 'firebase';
 import {WindowService} from './window.service';
+import {CoreService} from '../services/core.service';
+import * as uuid from 'uuid';
 
 @Component({
   selector: 'app-login',
@@ -25,6 +27,8 @@ export class LoginPage implements OnInit {
   verificationCode: string;
   private user: any;
   private showLogin = false;
+  private tocken: any;
+
 
   constructor(private route: ActivatedRoute,
               private auth: AuthService,
@@ -32,7 +36,8 @@ export class LoginPage implements OnInit {
               private router: Router,
               public loadingCtrl: LoadingController,
               private firebaseAuth: AngularFireAuth,
-              private win: WindowService) {
+              private win: WindowService,
+              private core: CoreService) {
 
   }
 
@@ -69,19 +74,49 @@ export class LoginPage implements OnInit {
     }
   }
 
-  verifyLoginCode() {
+  async verifyLoginCode() {
     if (this.verificationCode === null) {
-      this.presentToast('Please inserte Verification Code');
+      this.presentToast('Please insert Verification Code');
+    } else {
+
+      this.windowRef.confirmationResult
+          .confirm(this.verificationCode)
+          .then(result => {
+
+            this.user = result.user;
+            // this.router.navigate(['/home']);
+          })
+          .catch(error => {
+            console.log(error);
+            this.presentToast(error.MESSAGE);
+          });
+
+      try {
+        await this.core.checkPhoneNumber(this.phone)
+            .subscribe(res => {
+              console.log('dsdsda' + res);
+
+              if (Object.keys(res).length === 0) {
+                this.presentToast('User Not Found!');
+                console.log('in ifffffffffffffffffffffffff');
+                throw new Error();
+              } else {
+                console.log('in ELSE EEEEEEEEEE');
+                this.tocken = firebase.auth().currentUser.refreshToken;
+                const myId = uuid.v4();
+                console.log('ssssssss' + myId + '    ' + this.tocken + ' ');
+
+                this.core.sendAdminToken(this.phone, this.tocken, myId);
+
+                this.router.navigate(['/home']);
+              }
+            });
+
+          } catch (e) {
+            this.presentToast('User Not Found!');
+          }
     }
-    this.windowRef.confirmationResult
-        .confirm(this.verificationCode)
-        .then( result => {
 
-          this.user = result.user;
-          this.router.navigate(['/home']);
-
-        })
-        .catch( error => console.log(error, 'Incorrect code entered?'));
   }
 
   async presentToast(MESSAGE) {

@@ -10,14 +10,4 @@ export class AuthService {
 
   constructor(private afAuth: AngularFireAuth) { }
 
-  public login(PHONENUMBER) {
-      return  this.afAuth.auth.signInWithPhoneNumber(PHONENUMBER);
-      //     .then(res => {
-      //       console.log('On Success', res);
-      //     })
-      //     .catch(error => {
-      //       console.log('On Error', error);
-      //     }
-      // );
-  }
 }
