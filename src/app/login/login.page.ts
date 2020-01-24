@@ -16,6 +16,7 @@ import * as uuid from 'uuid';
 })
 export class LoginPage implements OnInit {
 
+
   phone: any;
   password: any;
   public resMessage: any;
